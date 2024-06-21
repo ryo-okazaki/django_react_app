@@ -1,0 +1,33 @@
+services:
+  django:
+    container_name: sample-django
+    build:
+      context: docker/django
+      dockerfile: Dockerfile
+    ports:
+      - "${DJANGO_HOST_PORT:-8000}:8000"
+    volumes:
+      - ${DJANGO_SRC_DIR:-./backend}:/workdir
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+
+  postgres:
+    container_name: sample-postgres
+    build:
+      context: docker/postgres
+      dockerfile: Dockerfile
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_NAME:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
